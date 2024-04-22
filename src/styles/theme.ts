@@ -8,7 +8,7 @@ export const theme = {
     error: "#671717",
     white: "#d1d1d1",
     light: "#abadac",
-    neutral: "#7f8483",
+    neutral: "#778483",
     dark: "#001822",
     black: "#040613",
   },

@@ -13,7 +13,7 @@ export const Container = styled.div<ContainerProps>`
 
   label {
     color: ${theme.colors.white};
-    font-size: 0%.0625rem;
+    font-size: 0.625rem;
   }
 
   input {
