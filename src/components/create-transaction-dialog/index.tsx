@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog } from "../dialog";
 import {
   Container,
   Content,
   CurrencyInput,
+  ErrorMessage,
   InputGroup,
   RadioForm,
   RadioGroup,
@@ -12,17 +13,48 @@ import { Button } from "../button";
 import { Title } from "../title";
 import { Input } from "../input";
 import { InputMask } from "@react-input/mask";
+import { useFetchAPI } from "../../hooks/useFetchAPI";
+import { CreateTransactionDate } from "../../validators/types";
+import { useForm } from "react-hook-form";
+import dayjs from "dayjs";
+import { createTransactionSchema } from "../../validators/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function CreateTransactionDialog() {
+  const { categories, fetchCategories, createTransaction } = useFetchAPI;
   const [open, setOpen] = useState(false);
+  const {
+    register,
+    reset,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<CreateTransactionDate>({
+    defaultValues: {
+      categoryId: "null",
+      title: "",
+      amount: "",
+      date: dayjs("2024-01-01").format("DD/MM/YYYY"),
+      type: "income",
+    },
+    resolver: zodResolver(createTransactionSchema),
+  });
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleClose = useCallback(() => {
+    reset();
     setOpen(false);
-  }, []);
+  }, [reset]);
 
-  const onSubmit = useCallback(() => {
-    handleClose();
-  }, [handleClose]);
+  const onSubmit = useCallback(
+    async (data: CreateTransactionDate) => {
+      await createTransaction();
+      handleClose();
+    },
+    [handleClose, createTransaction]
+  );
 
   return (
     <Dialog
@@ -35,22 +67,41 @@ export function CreateTransactionDialog() {
           title="Nova Transação"
           subtitle="Crie uma nova transação para seu controle financeiro"
         />
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Content>
             <InputGroup>
               <label>Categoria</label>
-              <select>
+              <select {...register("categoryID")}>
                 <option value="null">Selecione uma categoria</option>
+                {categories?.length &&
+                  categories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.title}
+                    </option>
+                  ))}
               </select>
             </InputGroup>
-            <Input label="Nome" placeholder="Nome da Transação" />
+            {errors.categoryId && (
+              <ErrorMessage>{errors.categoryId.message} </ErrorMessage>
+            )}
+
+            <Input
+              label="Nome"
+              placeholder="Nome da Transação"
+              {...register("title")}
+              error={errors.title?.message}
+            />
             <InputGroup>
               <label>Valor</label>
               <CurrencyInput
                 placeholder="R$ 0,00"
                 format="currency"
                 currency="BRL"
+                {...register("amount")}
               />
+              {errors.amount && (
+                <ErrorMessage>{errors.amount.message} </ErrorMessage>
+              )}
             </InputGroup>
             <InputMask
               component={Input}
@@ -59,16 +110,31 @@ export function CreateTransactionDialog() {
               variant="black"
               label="Data"
               placeholder="dd/mm/aaaa"
+              error={errors.date?.message}
+              {...register("date")}
             />
             <RadioForm>
               <RadioGroup>
-                <input type="radio" id="icome" value="income" name="type" />
+                <input
+                  type="radio"
+                  id="icome"
+                  value="income"
+                  {...register("type")}
+                />
                 <label htmlFor="income">Receita</label>
               </RadioGroup>
               <RadioGroup>
-                <input type="radio" id="expense" value="expense" name="type" />
+                <input
+                  type="radio"
+                  id="expense"
+                  value="expense"
+                  {...register("type")}
+                />
                 <label htmlFor="income">Gastos</label>
               </RadioGroup>
+              {errors.type && (
+                <ErrorMessage>{errors.type.message} </ErrorMessage>
+              )}
             </RadioForm>
           </Content>
 
@@ -76,7 +142,7 @@ export function CreateTransactionDialog() {
             <Button onClick={handleClose} variant="outline" type="button">
               Cancelar
             </Button>
-            <Button onClick={onSubmit} variant="outline" type="button">
+            <Button variant="outline" type="submit">
               Cadastrar
             </Button>
           </footer>
