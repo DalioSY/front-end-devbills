@@ -10,11 +10,18 @@ export type Category = {
 };
 
 export type CreateTransction = {
-  CategoryId: string;
+  categoryId: string;
   title: string;
   amount: string;
   type: "expense" | "income";
   date: string;
+};
+
+export type TransactionsFilter = {
+  title?: string;
+  categoryId?: string;
+  beginDate: string;
+  endDate: string;
 };
 
 export type Transaction = {
@@ -23,5 +30,5 @@ export type Transaction = {
   amount: number;
   type: "expense" | "income";
   date: Date;
-  Category: Category;
+  category: Category;
 };

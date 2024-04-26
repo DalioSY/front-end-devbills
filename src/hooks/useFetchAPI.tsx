@@ -7,15 +7,20 @@ import {
 } from "react";
 
 import { APIService } from "../services/api";
-import { Category } from "../services/api-types";
-import { CreateCategoryDate, CreateTransactionDate } from "../validators/types";
+import { Category, Transaction } from "../services/api-types";
 import { formatDate } from "../utils/format-date";
-
+import {
+  CreateCategoryDate,
+  CreateTransactionDate,
+  TransactionFilterDate,
+} from "../validators/types";
 interface FetchAPIProps {
   createCategory: (data: CreateCategoryDate) => Promise<void>;
   createTransaction: (data: CreateTransactionDate) => Promise<void>;
   fetchCategories: () => Promise<void>;
+  fetchTransactions: (filters: TransactionFilterDate) => Promise<void>;
   categories: Category[];
+  transactions: Transaction[];
 }
 
 const FetchAPIContext = createContext<FetchAPIProps>({} as FetchAPIProps);
@@ -26,6 +31,7 @@ type FetchAPIProviderProps = {
 
 export function FetchAPIProvider({ children }: FetchAPIProviderProps) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const createTransaction = useCallback(async (data: CreateTransactionDate) => {
     await APIService.createTransaction({
@@ -45,12 +51,27 @@ export function FetchAPIProvider({ children }: FetchAPIProviderProps) {
     setCategories(data);
   }, []);
 
+  const fetchTransactions = useCallback(
+    async (filters: TransactionFilterDate) => {
+      const transactions = await APIService.getTransactions({
+        ...filters,
+        beginDate: formatDate(filters.beginDate),
+        endDate: formatDate(filters.endDate),
+      });
+
+      setTransactions(transactions);
+    },
+    []
+  );
+
   return (
     <FetchAPIContext.Provider
       value={{
         categories,
+        transactions,
         createCategory,
         fetchCategories,
+        fetchTransactions,
         createTransaction,
       }}
     >
