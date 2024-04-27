@@ -26,15 +26,19 @@ import {
   SearchTransaction,
   Section,
   TransactionGroup,
+  CategoryBadge,
 } from "./styles";
-import { TransactionFilterDate } from "../../validators/types";
+import {
+  FinancialEvolutionFilterData,
+  TransactionFilterDate,
+} from "../../validators/types";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { transactionFilterDateSchema } from "../../validators/schemas";
-import { Category } from "../../services/api-types";
 import { useCallback, useEffect, useState } from "react";
 import { useFetchAPI } from "../../hooks/useFetchAPI";
+import { X } from "@phosphor-icons/react/dist/ssr";
+import { transactionsFilterSchema } from "../../validators/schemas";
 
 export function Home() {
   const transactionsFilterForm = useForm<TransactionFilterDate>({
@@ -44,36 +48,79 @@ export function Home() {
       beginDate: dayjs().startOf("month").format("DD/MM/YYYY"),
       endDate: dayjs().endOf("month").format("DD/MM/YYYY"),
     },
-    resolver: zodResolver(transactionFilterDateSchema),
+    resolver: zodResolver(transactionsFilterSchema),
   });
 
-  const { transactions, fetchTransactions } = useFetchAPI();
+  const financialEvolutionFilterForm = useForm<FinancialEvolutionFilterData>({
+    defaultValues: {
+      year: dayjs().get("year").toString(),
+    },
+  });
+
+  const {
+    transactions,
+    dashboard,
+    financialEvolution,
+    fetchFinancialEvolution,
+    fetchDashboard,
+    fetchTransactions,
+  } = useFetchAPI();
 
   useEffect(() => {
-    fetchTransactions(transactionsFilterForm.getValues());
-  }, [fetchTransactions, transactionsFilterForm]);
+    const { beginDate, endDate } = transactionsFilterForm.getValues();
 
-  const [sekectedCategory, setSelectedCategory] =
+    fetchDashboard({ beginDate, endDate });
+    fetchTransactions(transactionsFilterForm.getValues());
+    fetchFinancialEvolution(financialEvolutionFilterForm.getValues());
+  }, [
+    fetchTransactions,
+    transactionsFilterForm,
+    fetchDashboard,
+    fetchFinancialEvolution,
+    financialEvolutionFilterForm,
+  ]);
+
+  const [selectedCategory, setSelectedCategory] =
     useState<CategoryProps | null>(null);
 
   const handleSelectCategory = useCallback(
-    ({ id, title, color }: CategoryProps) => {
+    async ({ id, title, color }: CategoryProps) => {
       setSelectedCategory({ id, title, color });
       transactionsFilterForm.setValue("categoryId", id);
+
+      await fetchTransactions(transactionsFilterForm.getValues());
     },
-    [transactionsFilterForm]
+    [transactionsFilterForm, fetchTransactions]
   );
 
-  const handleDeselectCategory = useCallback(() => {
+  const handleDeselectCategory = useCallback(async () => {
     setSelectedCategory(null);
     transactionsFilterForm.setValue("categoryId", "");
-  }, [transactionsFilterForm]);
+
+    await fetchTransactions(transactionsFilterForm.getValues());
+  }, [transactionsFilterForm, fetchTransactions]);
 
   const onSubmitTransactions = useCallback(
     async (data: TransactionFilterDate) => {
       await fetchTransactions(data);
     },
     [fetchTransactions]
+  );
+
+  const onSubmitDashboard = useCallback(
+    async (data: TransactionFilterDate) => {
+      const { beginDate, endDate } = data;
+      await fetchDashboard({ beginDate, endDate });
+      await fetchTransactions(data);
+    },
+    [fetchDashboard, fetchTransactions]
+  );
+
+  const onSubmitFinancialEvolution = useCallback(
+    async (data: FinancialEvolutionFilterData) => {
+      await fetchFinancialEvolution(data);
+    },
+    [fetchFinancialEvolution]
   );
 
   return (
@@ -115,16 +162,22 @@ export function Home() {
                 {...transactionsFilterForm.register("endDate")}
               />
               <ButtonIcon
-                onClick={transactionsFilterForm.handleSubmit(
-                  onSubmitTransactions
-                )}
+                onClick={transactionsFilterForm.handleSubmit(onSubmitDashboard)}
               />
             </InputGroup>
           </Filters>
           <Balance>
-            <Card title="Saldo" amount={1000000} />
-            <Card title="Saldo" amount={1000000} variant="incomes" />
-            <Card title="Saldo" amount={1000000} variant="expenses" />
+            <Card title="Saldo" amount={dashboard?.balance?.balance || 0} />
+            <Card
+              title="Receitas"
+              amount={dashboard?.balance?.incomes || 0}
+              variant="incomes"
+            />
+            <Card
+              title="Gastos"
+              amount={dashboard?.balance?.expenses * -1 || 0}
+              variant="expenses"
+            />
           </Balance>
           <ChartContainer>
             <header>
@@ -132,9 +185,21 @@ export function Home() {
                 title="Gastos"
                 subtitle="Despesas por categoria no período"
               />
+              {selectedCategory && (
+                <CategoryBadge
+                  $color={selectedCategory.color}
+                  onClick={handleDeselectCategory}
+                >
+                  <X />
+                  {selectedCategory.title.toUpperCase()}
+                </CategoryBadge>
+              )}
             </header>
             <ChartContent>
-              <CategoriesPieChat onClick={handleSelectCategory} />
+              <CategoriesPieChat
+                expenses={dashboard.expenses}
+                onClick={handleSelectCategory}
+              />
             </ChartContent>
           </ChartContainer>
           <ChartContainer>
@@ -151,24 +216,31 @@ export function Home() {
                   variant="black"
                   label="Ano"
                   placeholder="aaaa"
+                  {...financialEvolutionFilterForm.register("year")}
                 />
-                <ButtonIcon />
+                <ButtonIcon
+                  onClick={financialEvolutionFilterForm.handleSubmit(
+                    onSubmitFinancialEvolution
+                  )}
+                />
               </ChartAction>
             </header>
             <ChartContent>
-              <FinacialEvolutionBarChart />
+              <FinacialEvolutionBarChart
+                financialEvolution={financialEvolution}
+              />
             </ChartContent>
           </ChartContainer>
         </Section>
         <Aside>
           <header>
-            <Title
-              title="Transações"
-              subtitle="Receitas e Gastos no periodo"
-              {...transactionsFilterForm.register("title")}
-            />
+            <Title title="Transações" subtitle="Receitas e Gastos no periodo" />
             <SearchTransaction>
-              <Input variant="black" placeholder="Procurar transação" />
+              <Input
+                variant="black"
+                placeholder="Procurar transação"
+                {...transactionsFilterForm.register("title")}
+              />
               <ButtonIcon
                 onClick={transactionsFilterForm.handleSubmit(
                   onSubmitTransactions

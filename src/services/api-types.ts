@@ -12,7 +12,7 @@ export type Category = {
 export type CreateTransction = {
   categoryId: string;
   title: string;
-  amount: string;
+  amount: number;
   type: "expense" | "income";
   date: string;
 };
@@ -31,4 +31,39 @@ export type Transaction = {
   type: "expense" | "income";
   date: Date;
   category: Category;
+};
+
+export type Balance = {
+  _id: string | null;
+  incomes: number;
+  expenses: number;
+  balance: number;
+};
+
+export type Exepense = {
+  _id: string;
+  title: string;
+  amount: number;
+  color: string;
+};
+
+export type Dashboard = {
+  balance: Balance;
+  expenses: Exepense[];
+};
+
+export type DashboardFilters = {
+  beginDate: string;
+  endDate: string;
+};
+
+export type FinancialEvolutionFilters = {
+  year: string;
+};
+
+export type FinancialEvolution = {
+  _id: [number, number];
+  incomes: number;
+  expenses: number;
+  balance: number;
 };

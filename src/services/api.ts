@@ -2,6 +2,10 @@ import {
   Category,
   CreateCategory,
   CreateTransction,
+  Dashboard,
+  DashboardFilters,
+  FinancialEvolution,
+  FinancialEvolutionFilters,
   Transaction,
   TransactionsFilter,
 } from "./api-types";
@@ -11,6 +15,22 @@ export class APIService {
   private static client = axios.create({
     baseURL: import.meta.env.VICTE_API_URL,
   });
+
+  static async getDashboard({
+    beginDate,
+    endDate,
+  }: DashboardFilters): Promise<Dashboard> {
+    const { data } = await APIService.client.get<Dashboard>(
+      "/transactions/dashboard",
+      {
+        params: {
+          beginDate,
+          endDate,
+        },
+      }
+    );
+    return data;
+  }
 
   static async createTransaction(
     createTransactionData: CreateTransction
@@ -53,6 +73,17 @@ export class APIService {
   }
   static async getCategories(): Promise<Category[]> {
     const { data } = await APIService.client.get<Category[]>("/categories");
+    return data;
+  }
+
+  static async getFinancialEvolution({
+    year,
+  }: FinancialEvolutionFilters): Promise<FinancialEvolution[]> {
+    const { data } = await APIService.client.get<FinancialEvolution[]>(
+      "/transactions/financial-evolution",
+      { params: { year } }
+    );
+
     return data;
   }
 }

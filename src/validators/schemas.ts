@@ -20,18 +20,18 @@ export const createCategorySchema = z.object({
     .string()
     .min(1, { message: "Deve conter pelo menos 1 caractere." })
     .max(255),
-  color: z.string().regex(/^#[A-Fa-f0-9]{6}$/, {
-    message: "Deve seguir o padão #rrggbb",
-  }),
+  color: z
+    .string()
+    .regex(/^#[A-Fa-f0-9]{6}$/, { message: "Deve seguir o padão #rrggbb" }),
 });
 
 export const createTransactionSchema = z.object({
-  categoryId: z.string().regex(/^(?!null$)/g, {
-    message: "Escolha uma categoria",
-  }),
+  categoryId: z
+    .string()
+    .regex(/^(?!null$)/g, { message: "Escolha uma categoria" }),
   title: z
     .string()
-    .min(1, { message: "Deve conter pelo menos 1 digito" })
+    .min(1, { message: "Deve conter pelo menos 1 caractere" })
     .max(255),
   amount: z
     .string()
@@ -43,4 +43,8 @@ export const createTransactionSchema = z.object({
   type: z.enum(["income", "expense"], {
     errorMap: () => ({ message: "Selecione um tipo válido" }),
   }),
+});
+
+export const financialEvolutionFilterSchema = z.object({
+  year: z.string().regex(/^\d{4}$/, { message: "Ano inválido" }),
 });
