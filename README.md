@@ -1,30 +1,41 @@
-# React + TypeScript + Vite
+<h1 align="center">Front-End CodeBurguer</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h2>Olá sejam bem-vindo</h2>
 
-Currently, two official plugins are available:
+<p>💵 Finalizando o front-end do projeto financeiro!</p>
+<p>Com muita dedicação e aprendizado, consegui finalizar a parte de front-end do meu projeto financeiro!</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<p>O desenvolvimento foi enriquecedor, principalmente por ter contado com o suporte do curso Dev Club. As aulas e a comunidade me proporcionaram conhecimento sólido e me guiaram para superar os desafios.</p>
 
-## Expanding the ESLint configuration
+<h4>Tecnologias:</h4>
+<ul>
+<li>⚙ React: Framework JavaScript para interfaces de usuário interativas e responsivas.</li>
+<li>🔧 API: Criei uma API para comunicação entre o frontend e o backend.</li>
+</ul>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+<p>
+No momento, estou finalizando a integração com a API que criei para o projeto e realizando alguns ajustes finais. 
+</p>
 
-- Configure the top-level `parserOptions` property like this:
+<h4>Link:</h4>
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+> Repoditório: https://github.com/DalioSY/front-end-devbills
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+> Linkedin: https://www.linkedin.com/in/dalio-s-yamada/
+
+<p>
+#hamburgueria #HTML #CSS #JavaScript #Github #React.js #Typescript #Node.js #Api #Express #Sequelize #Postgresql #Docker #FrontEnd #BackEnd #FullStack #Programador #Dev #Web #Desenvolvedor-Web #DesenvolvedorFrontEnd #DesenvolvedorBackEnd #DesenvolvedorFullStack #TransiçãoDeCarreira #jornadaproficional #aprendendo #tecnologia #openToWork #Recruiter #rh</p>
+<br>
+
+<div id="user-content-toc">
+  <ul align="center">
+    <h2 style="display: inline-block">Imagens:</h2>
+  </ul>
+</div>
+
+<div align="center"> 
+  <img src="./img/git-1.png" width="250px">
+  <img src="./img/git-2.png" width="250px">
+  <img src="./img/git-3.png" width="250px">
+ 
+</div>
